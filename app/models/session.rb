@@ -4,6 +4,7 @@ class Session < ActiveRecord::Base
   has_many :attendances, :dependent => :destroy
   has_many :students, through: :attendances
   has_many :assignments, :through => :afterschool_class
+  has_many :student_assignments, through: :assignments
 
 
   def absent_count

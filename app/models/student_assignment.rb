@@ -5,6 +5,7 @@
   delegate :due_date, :to => :assignment
 
   scope :completed, where("completion_time IS NOT NULL")
+  scope :by_current, find(:all, :joins => :assignment, :conditions => ['assignments.due_date >= ?', Date.today])
 
   # scope :this_week, where("due_date >= ?", Time.zone.now.beginning_of_week)
   # scope :happened_before, lambda { |some_date| where("completion_time < ?", date) }
