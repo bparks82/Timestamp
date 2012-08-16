@@ -12,9 +12,11 @@ class Student < ActiveRecord::Base
   validates_presence_of :first_name, :last_name, :afterschool_class
   accepts_nested_attributes_for :student_assignments
 
+  after_create :create_current_assignments
+
   def completed_assignments
     self.student_assignments.select { |s_a| s_a.completion_time && s_a.due_date >= Date.today }
-    #all completed assignments
+    #day's completed assignments
   end
 
   def completed_assignments_count
@@ -26,7 +28,11 @@ class Student < ActiveRecord::Base
   end
 
   def total_outstanding_assignments_count
-    self.total_outstanding_assignments.length
+    total_outstanding_assignments.length
+  end
+
+  def remaining_outstanding_assignments_count
+    total_outstanding_assignments_count - completed_assignments_count
   end
 
   def assignment_completion_percentage
@@ -43,5 +49,11 @@ class Student < ActiveRecord::Base
 
   def current_class_status(session_id)
     self.attendances.find_by_session_id(session_id).status
+  end
+
+  def create_current_assignments
+    grade_level.assignments.each do |assignment|
+      student_assignments.create(assignment_id: assignment.id) if assignment.due_date >= Date.today
+    end
   end
 end
